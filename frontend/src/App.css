@@ -1,0 +1,100 @@
+/* Make everything use border-box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Full page background + global font */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1F1F1F;
+  color: white;
+  font-family: "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 18px; /* bigger base font */
+}
+
+/* Let the React root fill the whole window */
+#root {
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Desktop: Hide sidebar by default, show when menu is open */
+.sidebar {
+  position: fixed !important;
+  left: -280px !important;
+  top: 0 !important;
+  transition: left 0.3s ease !important;
+  z-index: 1000 !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+.sidebar.mobile-open {
+  left: 0 !important;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Show mobile menu button */
+  .mobile-menu-button {
+    display: block !important;
+  }
+
+
+  /* Main content takes full width on mobile */
+  .main-content {
+    padding: 60px 15px 20px 15px !important;
+    width: 100% !important;
+  }
+
+  /* Adjust header sizes for mobile */
+  .header-title {
+    font-size: 28px !important;
+  }
+
+  .header-subtitle {
+    font-size: 16px !important;
+  }
+
+  /* Reduce padding in content area */
+  .main-content > div {
+    padding: 10px 10px 20px 10px !important;
+  }
+
+  /* Make header smaller on mobile */
+  .main-content > div:first-child {
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Navigation bar on mobile */
+  .main-content > div:nth-child(2) {
+    padding: 8px !important;
+    gap: 4px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .main-content > div:nth-child(2) a {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 240px !important;
+  }
+
+  .main-content {
+    padding: 30px 40px !important;
+  }
+
+  .header-title {
+    font-size: 30px !important;
+  }
+}
