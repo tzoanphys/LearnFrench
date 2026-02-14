@@ -155,7 +155,7 @@ function LayoutWithSidebar() {
           minHeight: '100vh',
         }}
       >
-        {/* Header */}
+        {/* Header - pink-red panel with white text (like second photo) */}
         <div
           style={{
             position: 'relative',
@@ -171,37 +171,6 @@ function LayoutWithSidebar() {
             boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           }}
         >
-          <button
-            className="login-button"
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '24px',
-              backgroundColor: '#f75475',
-              color: 'white',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: '10px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(247, 84, 117, 0.4)',
-              transition: 'all 0.2s ease',
-              letterSpacing: '0.5px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#e8436a'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(247, 84, 117, 0.5)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#f75475'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(247, 84, 117, 0.4)'
-            }}
-          >
-            Log in
-          </button>
           <h1
             className="header-title"
             style={{ margin: 0, fontSize: '32px', color: '#f75475' }}
