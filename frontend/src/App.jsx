@@ -1,8 +1,29 @@
 import { useState } from 'react'
+import { Link, Routes, Route, Outlet } from 'react-router-dom'
 import './App.css'
+import HomePage from './pages/HomePage'
+import CreateListPage from './pages/CreateListPage'
+import MyListsPage from './pages/MyListsPage'
+import InstructionsPage from './pages/InstructionsPage'
+import OtherQuizzesPage from './pages/OtherQuizzesPage'
+import SettingsPage from './pages/SettingsPage'
 
-function App() {
+const sidebarLinkStyle = {
+  color: '#f75475',
+  marginTop: '16px',
+  fontSize: '16px',
+  textDecoration: 'none',
+  display: 'block',
+  padding: '8px 0',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  transition: 'opacity 0.2s ease',
+}
+
+function LayoutWithSidebar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const closeMenu = () => setMobileMenuOpen(false)
 
   return (
     <div
@@ -45,7 +66,7 @@ function App() {
       {mobileMenuOpen && (
         <div
           className="mobile-menu-overlay"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={closeMenu}
           style={{
             position: 'fixed',
             top: 0,
@@ -85,7 +106,7 @@ function App() {
         >
           <h2 style={{ color: '#f75475', fontSize: '26px', margin: 0 }}>Menu</h2>
           <button
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={closeMenu}
             style={{
               backgroundColor: '#f75475',
               border: 'none',
@@ -101,21 +122,24 @@ function App() {
             ✕
           </button>
         </div>
-        <p style={{ color: '#f75475', marginTop: '16px', fontSize: '16px' }}>
+        <Link to="/" style={sidebarLinkStyle} onClick={closeMenu}>
+        🏠 Home
+        </Link>
+        <Link to="/create-list" style={sidebarLinkStyle} onClick={closeMenu}>
           Create New List
-        </p>
-        <p style={{ color: '#f75475', marginTop: '16px', fontSize: '16px' }}>
+        </Link>
+        <Link to="/my-lists" style={sidebarLinkStyle} onClick={closeMenu}>
           My Lists
-        </p>
-        <p style={{ color: '#f75475', marginTop: '16px', fontSize: '16px' }}>
+        </Link>
+        <Link to="/instructions" style={sidebarLinkStyle} onClick={closeMenu}>
           Instructions
-        </p>
-        <p style={{ color: '#f75475', marginTop: '16px', fontSize: '16px' }}>
+        </Link>
+        <Link to="/other-quizzes" style={sidebarLinkStyle} onClick={closeMenu}>
           Other quizzes
-        </p>
-        <p style={{ color: '#f75475', marginTop: '16px', fontSize: '16px' }}>
-        🛠️ Settings
-        </p>
+        </Link>
+        <Link to="/settings" style={sidebarLinkStyle} onClick={closeMenu}>
+          🛠️ Settings
+        </Link>
       </div>
 
       {/* Main area */}
@@ -197,20 +221,8 @@ function App() {
           </h2>
         </div>
 
-        {/* Content area */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '1100px',
-            flex: 1,
-            padding: '10px 20px 40px',
-            boxSizing: 'border-box',
-          }}
-        >
-          <p style={{ color: 'white', textAlign: 'center' }}>
-            Welcome. Your French learning app content will go here.
-          </p>
-        </div>
+        {/* Page content (each route renders here) */}
+        <Outlet />
 
         {/* Footer */}
         <footer
@@ -229,6 +241,21 @@ function App() {
         </footer>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LayoutWithSidebar />}>
+        <Route index element={<HomePage />} />
+        <Route path="create-list" element={<CreateListPage />} />
+        <Route path="my-lists" element={<MyListsPage />} />
+        <Route path="instructions" element={<InstructionsPage />} />
+        <Route path="other-quizzes" element={<OtherQuizzesPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
   )
 }
 
