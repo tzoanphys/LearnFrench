@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, Routes, Route, Outlet } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
 import './App.css'
 import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
 import CreateListPage from './pages/CreateListPage'
 import MyListsPage from './pages/MyListsPage'
 import InstructionsPage from './pages/InstructionsPage'
@@ -22,6 +24,7 @@ const sidebarLinkStyle = {
 
 function LayoutWithSidebar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, logout, isAuthenticated } = useAuth()
 
   const closeMenu = () => setMobileMenuOpen(false)
 
@@ -140,6 +143,24 @@ function LayoutWithSidebar() {
         <Link to="/settings" style={sidebarLinkStyle} onClick={closeMenu}>
           🛠️ Settings
         </Link>
+        {isAuthenticated ? (
+          <button
+            onClick={() => { closeMenu(); logout(); }}
+            style={{
+              ...sidebarLinkStyle,
+              marginTop: '24px',
+              background: 'none',
+              border: 'none',
+              textAlign: 'left',
+            }}
+          >
+            Log out
+          </button>
+        ) : (
+          <Link to="/login" style={sidebarLinkStyle} onClick={closeMenu}>
+            Log in
+          </Link>
+        )}
       </div>
 
       {/* Main area */}
@@ -218,6 +239,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LayoutWithSidebar />}>
         <Route index element={<HomePage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="create-list" element={<CreateListPage />} />
         <Route path="my-lists" element={<MyListsPage />} />
         <Route path="instructions" element={<InstructionsPage />} />
