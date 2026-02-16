@@ -5,30 +5,37 @@ import { useAuth } from '../context/AuthContext'
 function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    if (!email.trim()) {
-      setError('Email is required.')
+    if (!name.trim()) {
+      setError('Name is required.')
       return
     }
     if (!password.trim()) {
       setError('Password is required.')
       return
     }
-    if (!name.trim()) {
-      setError('Name is required.')
-      return
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), password }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data.error || 'Login failed.')
+        return
+      }
+      login(data.email, data.name)
+      navigate('/')
+    } catch (err) {
+      setError('Network error. Please try again.')
     }
-    // TODO: replace with real API call to Spring Boot (POST /api/auth/login)
-    // For now we "log in" locally; backend will verify password and return user
-    login(email.trim(), name.trim())
-    navigate('/')
   }
 
   const formStyle = {
@@ -64,6 +71,15 @@ function LoginPage() {
     cursor: 'pointer',
     marginTop: '8px',
   }
+  const linkRowStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '16px',
+    marginTop: '20px',
+    flexWrap: 'wrap',
+  }
+  const linkStyle = { color: '#f75475', fontSize: '14px', textDecoration: 'none' }
 
   return (
     <div
@@ -92,15 +108,6 @@ function LoginPage() {
           style={inputStyle}
           autoComplete="name"
         />
-        <label style={labelStyle}>Email (used for login and password recovery)</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          style={inputStyle}
-          autoComplete="email"
-        />
         <label style={labelStyle}>Password</label>
         <input
           type="password"
@@ -113,11 +120,16 @@ function LoginPage() {
         <button type="submit" style={buttonStyle}>
           Log in
         </button>
+        <div style={linkRowStyle}>
+          <Link to="/signin" style={linkStyle}>
+            Sign in
+          </Link>
+          <Link to="/forgot-password" style={linkStyle}>
+            Forget your password
+          </Link>
+        </div>
       </form>
-      <p style={{ color: 'white', marginTop: '16px', fontSize: '14px' }}>
-        No account yet? You can register via the same form (backend will add registration later).
-      </p>
-      <Link to="/" style={{ color: '#f75475', marginTop: '12px' }}>
+      <Link to="/" style={{ color: '#f75475', marginTop: '24px', fontSize: '14px' }}>
         ← Back to home
       </Link>
     </div>

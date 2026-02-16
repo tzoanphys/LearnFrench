@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { Link, Routes, Route, Outlet } from 'react-router-dom'
+import { Link, Routes, Route, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import './App.css'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
+import SignInPage from './pages/SignInPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import CreateListPage from './pages/CreateListPage'
 import MyListsPage from './pages/MyListsPage'
 import InstructionsPage from './pages/InstructionsPage'
 import OtherQuizzesPage from './pages/OtherQuizzesPage'
+import QuizPage from './pages/QuizPage'
 import SettingsPage from './pages/SettingsPage'
 
 const sidebarLinkStyle = {
@@ -22,9 +25,17 @@ const sidebarLinkStyle = {
   transition: 'opacity 0.2s ease',
 }
 
+const navItems = [
+  { path: '/create-list', label: 'Create New List' },
+  { path: '/my-lists', label: 'My Lists' },
+  { path: '/other-quizzes', label: 'Other quizzes' },
+  { path: '/instructions', label: 'Instructions' },
+]
+
 function LayoutWithSidebar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, logout, isAuthenticated } = useAuth()
+  const location = useLocation()
 
   const closeMenu = () => setMobileMenuOpen(false)
 
@@ -128,18 +139,6 @@ function LayoutWithSidebar() {
         <Link to="/" style={sidebarLinkStyle} onClick={closeMenu}>
         🏠 Home
         </Link>
-        <Link to="/create-list" style={sidebarLinkStyle} onClick={closeMenu}>
-          Create New List
-        </Link>
-        <Link to="/my-lists" style={sidebarLinkStyle} onClick={closeMenu}>
-          My Lists
-        </Link>
-        <Link to="/instructions" style={sidebarLinkStyle} onClick={closeMenu}>
-          Instructions
-        </Link>
-        <Link to="/other-quizzes" style={sidebarLinkStyle} onClick={closeMenu}>
-          Other quizzes
-        </Link>
         <Link to="/settings" style={sidebarLinkStyle} onClick={closeMenu}>
           🛠️ Settings
         </Link>
@@ -176,7 +175,7 @@ function LayoutWithSidebar() {
           minHeight: '100vh',
         }}
       >
-        {/* Header - pink-red panel with white text (like second photo) */}
+        {/* Header: title always; profile + nav bar only after login */}
         <div
           style={{
             position: 'relative',
@@ -198,17 +197,48 @@ function LayoutWithSidebar() {
           >
             French Vocabulary Practice
           </h1>
-          <h2
-            className="header-subtitle"
-            style={{
-              margin: '8px 0 0',
-              fontWeight: 'normal',
-              fontSize: '18px',
-              color: '#f75475',
-            }}
-          >
-            Practice • Quizzes • Audio
-          </h2>
+
+          {isAuthenticated && user && (
+            <nav
+              className="main-nav"
+              style={{
+                marginTop: '20px',
+                borderTop: '3px solid #f75475',
+                backgroundColor: 'rgba(26, 26, 26, 0.6)',
+                padding: '14px 28px',
+                borderRadius: '0 0 10px 10px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {navItems.map(({ path, label }) => {
+                const isActive = location.pathname === path
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    className="main-nav-link"
+                    style={{
+                      color: isActive ? '#fff' : 'rgba(255,255,255,0.78)',
+                      textDecoration: 'none',
+                      fontSize: '15px',
+                      fontWeight: isActive ? '600' : '500',
+                      padding: '10px 20px',
+                      borderRadius: '6px',
+                      backgroundColor: isActive ? 'rgba(247, 84, 117, 0.22)' : 'transparent',
+                      borderBottom: isActive ? '2px solid #f75475' : '2px solid transparent',
+                      transition: 'color 0.2s ease, background 0.2s ease, border-color 0.2s ease',
+                    }}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
+            </nav>
+          )}
         </div>
 
         {/* Page content (each route renders here) */}
@@ -240,10 +270,13 @@ function App() {
       <Route path="/" element={<LayoutWithSidebar />}>
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="signin" element={<SignInPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="create-list" element={<CreateListPage />} />
         <Route path="my-lists" element={<MyListsPage />} />
         <Route path="instructions" element={<InstructionsPage />} />
         <Route path="other-quizzes" element={<OtherQuizzesPage />} />
+        <Route path="quiz" element={<QuizPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>

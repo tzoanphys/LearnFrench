@@ -22,6 +22,12 @@ body {
   width: 100vw;
 }
 
+/* Main nav bar links - hover */
+.main-nav-link:hover {
+  color: #fff !important;
+  background-color: rgba(247, 84, 117, 0.15) !important;
+}
+
 /* Desktop: Hide sidebar by default, show when menu is open */
 .sidebar {
   position: fixed !important;

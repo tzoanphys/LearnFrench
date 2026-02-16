@@ -1,2 +1,7 @@
+com/learnfrench/service/EmailService.class
+com/learnfrench/service/AuthService.class
+com/learnfrench/entity/User.class
 com/learnfrench/LearnFrenchApplication.class
+com/learnfrench/controller/AuthController.class
 com/learnfrench/controller/HealthController.class
+com/learnfrench/repository/UserRepository.class
