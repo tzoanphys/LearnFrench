@@ -1,30 +1,46 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { getListById, createList, updateList } from '../utils/listStorage'
 
 const MIN_WORDS = 1
 const MAX_WORDS = 50
 const DEFAULT_COUNT = 1
+const DEFAULT_TITLE = 'My First List'
 const DRAFT_LIST_KEY = 'learnFrench_draft_list'
 
 function CreateListPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const editList = location.state?.editList
+
+  const [title, setTitle] = useState(DEFAULT_TITLE)
   const [wordCount, setWordCount] = useState(DEFAULT_COUNT)
   const [words, setWords] = useState(() =>
     Array.from({ length: DEFAULT_COUNT }, () => ({ french: '', translation: '' }))
   )
 
   useEffect(() => {
+    if (editList?.id) {
+      setTitle(editList.title || DEFAULT_TITLE)
+      const w = editList.words?.length ? editList.words : [{ french: '', translation: '' }]
+      setWordCount(w.length)
+      setWords(w)
+      return
+    }
     try {
       const raw = localStorage.getItem(DRAFT_LIST_KEY)
       if (raw) {
-        const { wordCount: savedCount, words: savedWords } = JSON.parse(raw)
+        const data = JSON.parse(raw)
+        if (data.title != null) setTitle(data.title)
+        const savedCount = data.wordCount
+        const savedWords = data.words
         if (savedCount >= MIN_WORDS && savedCount <= MAX_WORDS && Array.isArray(savedWords) && savedWords.length === savedCount) {
           setWordCount(savedCount)
           setWords(savedWords)
         }
       }
     } catch (_) {}
-  }, [])
+  }, [editList?.id])
 
   const handleCountChange = (e) => {
     const n = Math.min(MAX_WORDS, Math.max(MIN_WORDS, parseInt(e.target.value, 10) || MIN_WORDS))
@@ -46,9 +62,20 @@ function CreateListPage() {
   }
 
   const handleSave = () => {
+    const listWords = words.filter((w) => w.french.trim() || w.translation.trim())
+    if (listWords.length === 0) {
+      alert('Please add at least one word (French or translation).')
+      return
+    }
     try {
-      localStorage.setItem(DRAFT_LIST_KEY, JSON.stringify({ wordCount, words }))
-      alert('List saved.')
+      if (editList?.id) {
+        updateList(editList.id, title, listWords)
+        alert('List updated.')
+      } else {
+        createList(title, listWords)
+        alert('List created.')
+      }
+      navigate('/my-lists')
     } catch (e) {
       alert('Could not save.')
     }
@@ -104,6 +131,19 @@ function CreateListPage() {
   return (
     <div style={formStyle}>
       <h2 style={{ color: '#f75475', marginBottom: '24px' }}>Create New List</h2>
+
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{ display: 'block', color: '#f75475', marginBottom: '8px', fontWeight: '600' }}>
+          List title
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={DEFAULT_TITLE}
+          style={{ ...inputStyle, maxWidth: '400px' }}
+        />
+      </div>
 
       <div style={{ marginBottom: '24px' }}>
         <label style={{ display: 'block', color: '#f75475', marginBottom: '8px', fontWeight: '600' }}>

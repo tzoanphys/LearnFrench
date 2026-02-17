@@ -11,6 +11,7 @@ import MyListsPage from './pages/MyListsPage'
 import InstructionsPage from './pages/InstructionsPage'
 import OtherQuizzesPage from './pages/OtherQuizzesPage'
 import QuizPage from './pages/QuizPage'
+import ListProgressPage from './pages/ListProgressPage'
 import SettingsPage from './pages/SettingsPage'
 
 const sidebarLinkStyle = {
@@ -277,6 +278,7 @@ function App() {
         <Route path="instructions" element={<InstructionsPage />} />
         <Route path="other-quizzes" element={<OtherQuizzesPage />} />
         <Route path="quiz" element={<QuizPage />} />
+        <Route path="list-progress" element={<ListProgressPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>
