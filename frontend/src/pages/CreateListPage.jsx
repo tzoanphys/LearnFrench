@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getListById, createList, updateList } from '../utils/listStorage'
+import { createList, updateList } from '../utils/listStorage'
 
 const MIN_WORDS = 1
 const MAX_WORDS = 50
@@ -15,6 +15,7 @@ function CreateListPage() {
 
   const [title, setTitle] = useState(DEFAULT_TITLE)
   const [wordCount, setWordCount] = useState(DEFAULT_COUNT)
+  const [wordCountInput, setWordCountInput] = useState(String(DEFAULT_COUNT))
   const [words, setWords] = useState(() =>
     Array.from({ length: DEFAULT_COUNT }, () => ({ french: '', translation: '' }))
   )
@@ -24,6 +25,7 @@ function CreateListPage() {
       setTitle(editList.title || DEFAULT_TITLE)
       const w = editList.words?.length ? editList.words : [{ french: '', translation: '' }]
       setWordCount(w.length)
+      setWordCountInput(String(w.length))
       setWords(w)
       return
     }
@@ -36,6 +38,7 @@ function CreateListPage() {
         const savedWords = data.words
         if (savedCount >= MIN_WORDS && savedCount <= MAX_WORDS && Array.isArray(savedWords) && savedWords.length === savedCount) {
           setWordCount(savedCount)
+          setWordCountInput(String(savedCount))
           setWords(savedWords)
         }
       }
@@ -43,7 +46,28 @@ function CreateListPage() {
   }, [editList?.id])
 
   const handleCountChange = (e) => {
-    const n = Math.min(MAX_WORDS, Math.max(MIN_WORDS, parseInt(e.target.value, 10) || MIN_WORDS))
+    const raw = e.target.value.replace(/\D/g, '')
+    setWordCountInput(raw)
+    if (raw === '') return
+    const n = Math.min(MAX_WORDS, Math.max(MIN_WORDS, parseInt(raw, 10)))
+    if (Number.isNaN(n)) return
+    setWordCount(n)
+    setWords((prev) => {
+      if (n > prev.length) {
+        return [...prev, ...Array.from({ length: n - prev.length }, () => ({ french: '', translation: '' }))]
+      }
+      return prev.slice(0, n)
+    })
+  }
+
+  const handleCountBlur = () => {
+    const trimmed = wordCountInput.trim()
+    if (trimmed === '') {
+      setWordCountInput(String(wordCount))
+      return
+    }
+    const n = Math.min(MAX_WORDS, Math.max(MIN_WORDS, parseInt(trimmed, 10) || MIN_WORDS))
+    setWordCountInput(String(n))
     setWordCount(n)
     setWords((prev) => {
       if (n > prev.length) {
@@ -150,12 +174,15 @@ function CreateListPage() {
           How many words do you want to learn?
         </label>
         <input
-          type="number"
-          min={MIN_WORDS}
-          max={MAX_WORDS}
-          value={wordCount}
+          type="text"
+          inputMode="numeric"
+          minLength={1}
+          maxLength={2}
+          value={wordCountInput}
           onChange={handleCountChange}
+          onBlur={handleCountBlur}
           style={{ ...inputStyle, width: '100px' }}
+          aria-label="Number of words"
         />
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginTop: '8px' }}>
           Between {MIN_WORDS} and {MAX_WORDS}. Translation can be in any script: Latin, Greek, Cyrillic, Kanji, Hiragana, Korean, etc.

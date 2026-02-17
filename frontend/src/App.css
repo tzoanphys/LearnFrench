@@ -28,6 +28,17 @@ body {
   background-color: rgba(247, 84, 117, 0.15) !important;
 }
 
+/* Remove number input spinners so user can type the value (e.g. 2) without arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Desktop: Hide sidebar by default, show when menu is open */
 .sidebar {
   position: fixed !important;
