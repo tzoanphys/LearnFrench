@@ -28,6 +28,13 @@ body {
   background-color: rgba(247, 84, 117, 0.15) !important;
 }
 
+/* Quiz type selection buttons */
+.quiz-type-btn:hover {
+  border-color: #f75475 !important;
+  background-color: rgba(247, 84, 117, 0.12) !important;
+  transform: translateY(-2px);
+}
+
 /* Remove number input spinners so user can type the value (e.g. 2) without arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

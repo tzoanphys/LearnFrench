@@ -11,6 +11,7 @@ import MyListsPage from './pages/MyListsPage'
 import InstructionsPage from './pages/InstructionsPage'
 import OtherQuizzesPage from './pages/OtherQuizzesPage'
 import QuizPage from './pages/QuizPage'
+import QuizSelectPage from './pages/QuizSelectPage'
 import ListProgressPage from './pages/ListProgressPage'
 import SettingsPage from './pages/SettingsPage'
 
@@ -277,6 +278,7 @@ function App() {
         <Route path="my-lists" element={<MyListsPage />} />
         <Route path="instructions" element={<InstructionsPage />} />
         <Route path="other-quizzes" element={<OtherQuizzesPage />} />
+        <Route path="quiz-select" element={<QuizSelectPage />} />
         <Route path="quiz" element={<QuizPage />} />
         <Route path="list-progress" element={<ListProgressPage />} />
         <Route path="settings" element={<SettingsPage />} />

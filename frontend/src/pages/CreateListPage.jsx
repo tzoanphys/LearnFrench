@@ -19,6 +19,7 @@ function CreateListPage() {
   const [words, setWords] = useState(() =>
     Array.from({ length: DEFAULT_COUNT }, () => ({ french: '', translation: '' }))
   )
+  const [hasBeenSaved, setHasBeenSaved] = useState(false)
 
   useEffect(() => {
     if (editList?.id) {
@@ -46,6 +47,7 @@ function CreateListPage() {
   }, [editList?.id])
 
   const handleCountChange = (e) => {
+    setHasBeenSaved(false)
     const raw = e.target.value.replace(/\D/g, '')
     setWordCountInput(raw)
     if (raw === '') return
@@ -67,6 +69,7 @@ function CreateListPage() {
       return
     }
     const n = Math.min(MAX_WORDS, Math.max(MIN_WORDS, parseInt(trimmed, 10) || MIN_WORDS))
+    setHasBeenSaved(false)
     setWordCountInput(String(n))
     setWordCount(n)
     setWords((prev) => {
@@ -78,6 +81,7 @@ function CreateListPage() {
   }
 
   const updateWord = (index, field, value) => {
+    setHasBeenSaved(false)
     setWords((prev) => {
       const next = [...prev]
       next[index] = { ...next[index], [field]: value }
@@ -99,19 +103,20 @@ function CreateListPage() {
         createList(title, listWords)
         alert('List created.')
       }
-      navigate('/my-lists')
+      setHasBeenSaved(true)
     } catch (e) {
       alert('Could not save.')
     }
   }
 
   const handleStart = () => {
+    if (!hasBeenSaved) return
     const list = words.filter((w) => w.french.trim() || w.translation.trim())
     if (list.length === 0) {
       alert('Please add at least one word (French or translation).')
       return
     }
-    navigate('/quiz', { state: { words: list } })
+    navigate('/quiz-select', { state: { words: list } })
   }
 
   const formStyle = {
@@ -163,7 +168,7 @@ function CreateListPage() {
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setHasBeenSaved(false); setTitle(e.target.value); }}
           placeholder={DEFAULT_TITLE}
           style={{ ...inputStyle, maxWidth: '400px' }}
         />
@@ -247,15 +252,17 @@ function CreateListPage() {
         <button
           type="button"
           onClick={handleStart}
+          disabled={!hasBeenSaved}
           style={{
             padding: '14px 32px',
-            backgroundColor: '#f75475',
+            backgroundColor: hasBeenSaved ? '#f75475' : '#555',
             color: 'white',
             border: 'none',
             borderRadius: '10px',
             fontSize: '18px',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: hasBeenSaved ? 'pointer' : 'not-allowed',
+            opacity: hasBeenSaved ? 1 : 0.7,
           }}
         >
           Start
