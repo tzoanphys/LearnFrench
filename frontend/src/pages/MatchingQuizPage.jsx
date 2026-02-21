@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { addMatchingGameResult } from '../utils/matchingProgress'
 
 const ROUNDS_TOTAL = 10
 const WORDS_PER_ROUND = 4
@@ -20,12 +21,24 @@ function pickRandomFromPool(pool, n) {
   return shuffle(Array.from(indices).map((i) => pool[i]))
 }
 
+function speakFrench(text) {
+  if (!text || !window.speechSynthesis) return
+  const u = new SpeechSynthesisUtterance(text)
+  u.lang = 'fr-FR'
+  u.rate = 0.9
+  window.speechSynthesis.cancel()
+  window.speechSynthesis.speak(u)
+}
+
 function MatchingQuizPage() {
   const location = useLocation()
   const navigate = useNavigate()
+  const listId = location.state?.listId ?? null
+  const list = location.state?.list ?? null
   const words = (location.state?.words || []).filter((w) => (w.french || '').trim() && (w.translation || '').trim())
 
   const [currentRound, setCurrentRound] = useState(0)
+  const gameCountsRef = useRef({})
   const [roundWords, setRoundWords] = useState([]) // [{ french, translation, wordIndex }, ...]
   const [leftOrder, setLeftOrder] = useState([])   // indices into roundWords
   const [rightOrder, setRightOrder] = useState([])
@@ -72,6 +85,8 @@ function MatchingQuizPage() {
 
   const handleLeftClick = (leftPos) => {
     if (Array.from(matchedPairs).some((p) => p.startsWith(leftPos + '-'))) return
+    const w = roundWords[leftOrder[leftPos]]
+    if (w?.french) speakFrench(w.french)
     setSelectedLeft(leftPos)
     setSelectedRight(null)
   }
@@ -83,6 +98,8 @@ function MatchingQuizPage() {
     const rightRoundIdx = rightOrder[rightPos]
     const isCorrect = leftRoundIdx === rightRoundIdx
     if (isCorrect) {
+      const w = roundWords[leftRoundIdx]
+      if (w?.french) speakFrench(w.french)
       setMatchedPairs((prev) => new Set([...prev, `${selectedLeft}-${rightPos}`]))
       setSelectedLeft(null)
       setSelectedRight(null)
@@ -103,11 +120,15 @@ function MatchingQuizPage() {
     const wasFullRound = roundWords.length === WORDS_PER_ROUND
     if (wasFullRound) setRoundsCorrect((r) => r + 1)
     if (nextRound >= ROUNDS_TOTAL) {
+      gameCountsRef.current = newCounts
+      if (listId) addMatchingGameResult(listId, newCounts)
       setGameOver(true)
       return
     }
     const nextPool = buildPool(words, newCounts)
     if (nextPool.length === 0) {
+      gameCountsRef.current = newCounts
+      if (listId) addMatchingGameResult(listId, newCounts)
       setGameOver(true)
       return
     }
@@ -150,11 +171,16 @@ function MatchingQuizPage() {
   }
 
   if (gameOver) {
+    const totalPairs = ROUNDS_TOTAL * WORDS_PER_ROUND
+    const gamePercent = totalPairs > 0 ? Math.round((roundsCorrect * WORDS_PER_ROUND / totalPairs) * 100) : 0
     return (
       <div style={{ padding: '20px', maxWidth: '1100px' }}>
         <h2 style={{ color: '#f75475', marginBottom: '16px' }}>Matching quiz — Game over</h2>
-        <p style={{ color: 'white', fontSize: '18px', marginBottom: '24px' }}>
+        <p style={{ color: 'white', fontSize: '18px', marginBottom: '8px' }}>
           Score: <strong>{roundsCorrect}/{ROUNDS_TOTAL}</strong> rounds
+        </p>
+        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '16px', marginBottom: '24px' }}>
+          This game: <strong style={{ color: '#f75475' }}>{gamePercent}%</strong>
         </p>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <button
@@ -188,6 +214,23 @@ function MatchingQuizPage() {
           >
             Back to quiz types
           </button>
+          {listId && list && (
+            <button
+              type="button"
+              onClick={() => navigate('/list-progress', { state: { list } })}
+              style={{
+                padding: '14px 28px',
+                backgroundColor: 'rgba(247, 84, 117, 0.3)',
+                color: 'white',
+                border: '1px solid #f75475',
+                borderRadius: '10px',
+                fontSize: '16px',
+                cursor: 'pointer',
+              }}
+            >
+              See progress
+            </button>
+          )}
         </div>
       </div>
     )

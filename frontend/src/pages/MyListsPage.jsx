@@ -26,7 +26,7 @@ function MyListsPage() {
       alert('This list has no words.')
       return
     }
-    navigate('/quiz-select', { state: { words } })
+    navigate('/quiz-select', { state: { words, listId: list.id, list } })
   }
 
   const handleSeeProgress = (list) => {

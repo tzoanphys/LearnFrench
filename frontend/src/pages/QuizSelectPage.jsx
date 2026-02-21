@@ -16,7 +16,7 @@ function QuizSelectPage() {
 
   const handleChoose = (mode) => {
     if (mode === 'matching') {
-      navigate('/quiz/matching', { state: { words } })
+      navigate('/quiz/matching', { state: { words, listId: location.state?.listId, list: location.state?.list } })
       return
     }
     navigate('/quiz', { state: { words, mode } })

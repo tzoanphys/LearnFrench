@@ -56,6 +56,25 @@ function HomePage() {
         </>
       ) : (
         <>
+          <div
+            style={{
+              marginBottom: '32px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="French Vocabulary Practice"
+              style={{
+                width: '160px',
+                height: '160px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 0 20px rgba(247, 84, 117, 0.35))',
+              }}
+            />
+          </div>
           <p style={{ color: 'white', textAlign: 'center', marginBottom: '24px' }}>
             Welcome. Log in to create your own lists and practice your French.
           </p>

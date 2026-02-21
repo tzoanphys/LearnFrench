@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { getMatchingProgress, matchingPercent, MATCHING_MAX_PERCENT } from '../utils/matchingProgress'
 
 function ListProgressPage() {
   const location = useLocation()
@@ -29,15 +30,16 @@ function ListProgressPage() {
     )
   }
 
-  const wordCount = list.words?.length ?? 0
-  // Placeholder: no progress tracking yet - could later use localStorage or backend
-  const progressPercent = 0
-  const wordsMastered = 0
+  const wordList = list.words || []
+  const progress = getMatchingProgress(list.id)
 
   return (
     <div style={{ width: '100%', maxWidth: '1100px', flex: 1, padding: '20px', boxSizing: 'border-box' }}>
       <h2 style={{ color: '#f75475', marginBottom: '8px' }}>Progress</h2>
-      <h3 style={{ color: 'white', marginBottom: '24px', fontWeight: 'normal' }}>{list.title || 'Untitled list'}</h3>
+      <h3 style={{ color: 'white', marginBottom: '8px', fontWeight: 'normal' }}>{list.title || 'Untitled list'}</h3>
+      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '24px' }}>
+        Matching quiz only (max {MATCHING_MAX_PERCENT}% per word). Other games will add more later.
+      </p>
 
       <div
         style={{
@@ -50,15 +52,53 @@ function ListProgressPage() {
       >
         <div style={{ marginBottom: '16px' }}>
           <span style={{ color: 'rgba(255,255,255,0.8)' }}>Words in list: </span>
-          <span style={{ color: 'white', fontWeight: '600' }}>{wordCount}</span>
+          <span style={{ color: 'white', fontWeight: '600' }}>{wordList.length}</span>
         </div>
-        <div style={{ marginBottom: '16px' }}>
-          <span style={{ color: 'rgba(255,255,255,0.8)' }}>Words mastered: </span>
-          <span style={{ color: 'white', fontWeight: '600' }}>{wordsMastered}</span>
-        </div>
-        <div>
-          <span style={{ color: 'rgba(255,255,255,0.8)' }}>Progress: </span>
-          <span style={{ color: '#f75475', fontWeight: '600' }}>{progressPercent}%</span>
+
+        <div style={{ marginTop: '20px' }}>
+          <div style={{ color: '#f75475', fontWeight: '600', marginBottom: '12px' }}>Per word (Matching)</div>
+          {wordList.length === 0 ? (
+            <p style={{ color: 'rgba(255,255,255,0.7)' }}>No words in this list.</p>
+          ) : (
+            wordList.map((w, idx) => {
+              const totalCorrect = Number(progress[String(idx)]) || 0
+              const percent = Math.round(matchingPercent(totalCorrect))
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    marginBottom: '16px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                    <span style={{ color: 'white', fontWeight: '500', minWidth: '120px' }}>
+                      {w.french?.trim() || '(no word)'}
+                    </span>
+                    <span style={{ color: '#f75475', fontSize: '14px', fontWeight: '600' }}>{percent}%</span>
+                  </div>
+                  <div
+                    style={{
+                      height: '10px',
+                      borderRadius: '5px',
+                      backgroundColor: '#333',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${percent}%`,
+                        maxWidth: '100%',
+                        backgroundColor: '#f75475',
+                        borderRadius: '5px',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+                </div>
+              )
+            })
+          )}
         </div>
       </div>
 

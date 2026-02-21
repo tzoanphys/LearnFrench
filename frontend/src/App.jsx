@@ -196,8 +196,29 @@ function LayoutWithSidebar() {
         >
           <h1
             className="header-title"
-            style={{ margin: 0, fontSize: '32px', color: '#f75475' }}
+            style={{
+              margin: 0,
+              fontSize: '32px',
+              color: '#f75475',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '14px',
+              flexWrap: 'wrap',
+            }}
           >
+            {isAuthenticated && (
+              <img
+                src="/logo.png"
+                alt=""
+                style={{
+                  height: '44px',
+                  width: '44px',
+                  objectFit: 'contain',
+                  flexShrink: 0,
+                }}
+              />
+            )}
             French Vocabulary Practice
           </h1>
 
