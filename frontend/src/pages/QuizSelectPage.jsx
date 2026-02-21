@@ -15,6 +15,10 @@ function QuizSelectPage() {
   const words = location.state?.words || []
 
   const handleChoose = (mode) => {
+    if (mode === 'matching') {
+      navigate('/quiz/matching', { state: { words } })
+      return
+    }
     navigate('/quiz', { state: { words, mode } })
   }
 
